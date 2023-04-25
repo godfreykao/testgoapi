@@ -1,7 +1,6 @@
 package validator
 
 import (
-	"fmt"
 	"strings"
 	"testgoapi/resource"
 
@@ -13,10 +12,6 @@ type ErrorResponse struct {
 	Message string
 }
 
-var messageFormat = map[string]string{
-	"required": "%s is required",
-}
-
 func Fails(params interface{}) any {
 	err := govalidator.New().Struct(params)
 
@@ -25,13 +20,10 @@ func Fails(params interface{}) any {
 
 		field := e.Field()
 		field = strings.ToLower(field)
-		tag := e.Tag()
-
-		message := fmt.Sprintf(messageFormat[tag], field)
 
 		return ErrorResponse{
 			Code:    resource.ErrorCode[field],
-			Message: message,
+			Message: "Invalid " + field,
 		}
 	}
 
