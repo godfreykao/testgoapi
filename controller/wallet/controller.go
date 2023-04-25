@@ -22,6 +22,11 @@ func UpdateBalance(c *fiber.Ctx) error {
 		At            string            `json:"at"`
 		Extra         map[string]string `json:"extra"`
 	}{}
+	/*
+		params := struct {
+			BrandId uint `json:"brandid" validate:"required"`
+		}{}
+	*/
 	if err := c.BodyParser(&params); err != nil {
 		return err
 	}
@@ -30,34 +35,16 @@ func UpdateBalance(c *fiber.Ctx) error {
 		return c.JSON(err)
 	}
 
-	/*
-		err := validator.New().Struct(&params)
-
-		if validationErrors, ok := err.(validator.ValidationErrors); ok {
-			if len(validationErrors) > 0 {
-				dump.Printf(validationErrors[0])
-			}
-		}
-	*/
-
 	if true {
 		panic("dopanic")
 	}
 
-	//	arr := map[string]int{"foo": 1, "name": 2}
-	/*
-		if err := validator.New().Struct(&params); err != nil {
-			//return c.JSON(err.Error())
-			fmt.Printf("%T", err.Error())
-			//fmt.Println(err.Error())
-			return c.SendString(err.Error())
-		}
-	*/
 	obj, err := json.Marshal(params)
 	if err != nil {
 		fmt.Println(err)
 	}
 	fmt.Println(string(obj))
 	//fmt.Println(c.AllParams())
+	//return c.SendString(err.Error())
 	return c.JSON(params)
 }

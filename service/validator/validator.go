@@ -1,8 +1,11 @@
 package validator
 
 import (
+	"fmt"
+	"strings"
+	"testgoapi/resource"
+
 	govalidator "github.com/go-playground/validator/v10"
-	"github.com/lgbya/go-dump"
 )
 
 type ErrorResponse struct {
@@ -10,17 +13,27 @@ type ErrorResponse struct {
 	Message string
 }
 
+var messageFormat = map[string]string{
+	"required": "%s is required",
+}
+
 func Fails(params interface{}) any {
 	err := govalidator.New().Struct(params)
 
-	if validationErrors, ok := err.(govalidator.ValidationErrors); ok {
-		if len(validationErrors) > 0 {
-			dump.Printf(validationErrors[0])
+	if errors, ok := err.(govalidator.ValidationErrors); ok {
+		e := errors[0]
+
+		field := e.Field()
+		field = strings.ToLower(field)
+		tag := e.Tag()
+
+		message := fmt.Sprintf(messageFormat[tag], field)
+
+		return ErrorResponse{
+			Code:    resource.ErrorCode[field],
+			Message: message,
 		}
 	}
 
-	return ErrorResponse{
-		Code:    100,
-		Message: "Invalid brandid",
-	}
+	return nil
 }
