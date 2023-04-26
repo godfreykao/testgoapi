@@ -1,9 +1,12 @@
 package validator
 
 import (
+	"encoding/json"
+	"regexp"
 	"strings"
 	"testgoapi/resource"
 
+	"github.com/davecgh/go-spew/spew"
 	govalidator "github.com/go-playground/validator/v10"
 )
 
@@ -28,4 +31,28 @@ func Fails(params interface{}) any {
 	}
 
 	return nil
+}
+
+func BodyParserFails(params interface{}) any {
+	spew.Dump(params)
+	if value, ok := params.(*json.UnmarshalTypeError); ok {
+		rgx := regexp.MustCompile(`json: cannot unmarshal .+ into Go struct field .([a-zA-z]+)`)
+		matches := rgx.FindStringSubmatch(value.Error())
+
+		field := matches[1]
+
+		return ErrorResponse{
+			Code:    resource.ErrorCode[field],
+			Message: "Invalid " + field,
+		}
+	}
+
+	return nil
+}
+
+func FieldFails(field string) ErrorResponse {
+	return ErrorResponse{
+		Code:    resource.ErrorCode[field],
+		Message: "Invalid " + field,
+	}
 }
